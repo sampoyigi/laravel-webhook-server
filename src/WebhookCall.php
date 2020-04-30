@@ -11,19 +11,19 @@ use Spatie\WebhookServer\Signer\Signer;
 
 class WebhookCall
 {
-    protected CallWebhookJob $callWebhookJob;
+    protected $callWebhookJob;
 
-    protected string $uuid = '';
+    protected $uuid = '';
 
-    protected string $secret;
+    protected $secret;
 
-    protected Signer $signer;
+    protected $signer;
 
-    protected array $headers = [];
+    protected $headers = [];
 
-    private array $payload = [];
+    private $payload = [];
 
-    private $signWebhook = true;
+    private $signWebhook = TRUE;
 
     public static function create(): self
     {
@@ -102,7 +102,7 @@ class WebhookCall
 
     public function useBackoffStrategy(string $backoffStrategyClass): self
     {
-        if (! is_subclass_of($backoffStrategyClass, BackoffStrategy::class)) {
+        if (!is_subclass_of($backoffStrategyClass, BackoffStrategy::class)) {
             throw InvalidBackoffStrategy::doesNotExtendBackoffStrategy($backoffStrategyClass);
         }
 
@@ -120,7 +120,7 @@ class WebhookCall
 
     public function signUsing(string $signerClass): self
     {
-        if (! is_subclass_of($signerClass, Signer::class)) {
+        if (!is_subclass_of($signerClass, Signer::class)) {
             throw InvalidSigner::doesImplementSigner($signerClass);
         }
 
@@ -131,7 +131,7 @@ class WebhookCall
 
     public function doNotSign(): self
     {
-        $this->signWebhook = false;
+        $this->signWebhook = FALSE;
 
         return $this;
     }
@@ -143,7 +143,7 @@ class WebhookCall
         return $this;
     }
 
-    public function verifySsl(bool $verifySsl = true): self
+    public function verifySsl(bool $verifySsl = TRUE): self
     {
         $this->callWebhookJob->verifySsl = $verifySsl;
 
@@ -152,7 +152,7 @@ class WebhookCall
 
     public function doNotVerifySsl(): self
     {
-        $this->verifySsl(false);
+        $this->verifySsl(FALSE);
 
         return $this;
     }
@@ -187,7 +187,7 @@ class WebhookCall
 
     protected function prepareForDispatch(): void
     {
-        if (! $this->callWebhookJob->webhookUrl) {
+        if (!$this->callWebhookJob->webhookUrl) {
             throw CouldNotCallWebhook::urlNotSet();
         }
 
@@ -202,7 +202,7 @@ class WebhookCall
     {
         $headers = $this->headers;
 
-        if (! $this->signWebhook) {
+        if (!$this->signWebhook) {
             return $headers;
         }
 

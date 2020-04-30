@@ -5,7 +5,6 @@ namespace Spatie\WebhookServer;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -20,38 +19,38 @@ class CallWebhookJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public ?string $webhookUrl = null;
+    public $webhookUrl = null;
 
-    public string $httpVerb;
+    public $httpVerb;
 
-    public int $tries;
+    public $tries;
 
-    public int $requestTimeout;
+    public $requestTimeout;
 
-    public string $backoffStrategyClass;
+    public $backoffStrategyClass;
 
-    public ?string $signerClass = null;
+    public $signerClass = null;
 
-    public array $headers = [];
+    public $headers = [];
 
-    public bool $verifySsl;
+    public $verifySsl;
 
     /** @var string */
     public $queue;
 
-    public array $payload = [];
+    public $payload = [];
 
-    public array $meta = [];
+    public $meta = [];
 
-    public array $tags = [];
+    public $tags = [];
 
-    public string $uuid = '';
+    public $uuid = '';
 
-    private ?Response $response = null;
+    private $response = null;
 
-    private ?string $errorType = null;
+    private $errorType = null;
 
-    private ?string $errorMessage = null;
+    private $errorMessage = null;
 
     public function handle()
     {
@@ -71,21 +70,22 @@ class CallWebhookJob implements ShouldQueue
                 'headers' => $this->headers,
             ], $body));
 
-            if (! Str::startsWith($this->response->getStatusCode(), 2)) {
+            if (!Str::startsWith($this->response->getStatusCode(), 2)) {
                 throw new Exception('Webhook call failed');
             }
 
             $this->dispatchEvent(WebhookCallSucceededEvent::class);
 
             return;
-        } catch (Exception $exception) {
+        }
+        catch (Exception $exception) {
             if ($exception instanceof RequestException) {
                 $this->response = $exception->getResponse();
                 $this->errorType = get_class($exception);
                 $this->errorMessage = $exception->getMessage();
             }
 
-            if (! $lastAttempt) {
+            if (!$lastAttempt) {
                 /** @var \Spatie\WebhookServer\BackoffStrategy\BackoffStrategy $backoffStrategy */
                 $backoffStrategy = app($this->backoffStrategyClass);
 
