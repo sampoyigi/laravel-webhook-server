@@ -23,6 +23,8 @@ class CallWebhookJob implements ShouldQueue
 
     public $httpVerb;
 
+    public $postAsJson = TRUE;
+
     public $tries;
 
     public $requestTimeout;
@@ -60,9 +62,14 @@ class CallWebhookJob implements ShouldQueue
         $lastAttempt = $this->attempts() >= $this->tries;
 
         try {
-            $body = strtoupper($this->httpVerb) === 'GET'
-                ? ['query' => $this->payload]
-                : ['body' => json_encode($this->payload)];
+            if (strtoupper($this->httpVerb) === 'GET') {
+                $body = ['query' => $this->payload];
+            }
+            else {
+                $body = !$this->postAsJson
+                    ? ['form_params' => $this->payload]
+                    : ['body' => json_encode($this->payload)];
+            }
 
             $this->response = $client->request($this->httpVerb, $this->webhookUrl, array_merge([
                 'timeout' => $this->requestTimeout,

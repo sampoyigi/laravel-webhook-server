@@ -93,6 +93,13 @@ class WebhookCall
         return $this;
     }
 
+    public function postAsJson(bool $postAsJson): self
+    {
+        $this->callWebhookJob->postAsJson = $postAsJson;
+
+        return $this;
+    }
+
     public function maximumTries(int $tries): self
     {
         $this->callWebhookJob->tries = $tries;
